@@ -78,6 +78,18 @@ module.exports = (env) ->
 
       @framework.ruleManager.addActionProvider(new MqttActionProvider(@framework, @mqttclient))
 
+      @framework.on "after init", =>
+        # Check if the mobile-frontend was loaded and get a instance
+        mobileFrontend = @framework.pluginManager.getPlugin 'mobile-frontend'
+        if mobileFrontend?
+          mobileFrontend.registerAssetFile 'js', 'pimatic-led-light/ui/led-light.coffee'
+          mobileFrontend.registerAssetFile 'css', 'pimatic-led-light/ui/led-light.css'
+          mobileFrontend.registerAssetFile 'html', 'pimatic-led-light/ui/led-light.html'
+          mobileFrontend.registerAssetFile 'js', 'pimatic-led-light/ui/vendor/async.js'
+          mobileFrontend.registerAssetFile 'js', 'pimatic-led-light/ui/vendor/one_color_2.5.0.js'
+        else
+          env.logger.warn 'your plugin could not find the mobile-frontend. No gui will be available'
+
     callbackHandler: (className, classType) ->
       # this closure is required to keep the className and classType context as part of the iteration
       return (config, lastState) =>
